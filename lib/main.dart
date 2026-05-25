@@ -1,20 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/app.dart';
+import 'package:personal_finance_tracker/services/hive_service.dart';
 
-void main() {
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await HiveService.init();
+  runApp(const App());
 }
