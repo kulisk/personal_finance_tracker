@@ -1,8 +1,10 @@
+// Reusable list tile for account rows.
 import 'package:flutter/material.dart';
 
 import '../models/account.dart';
 import '../utils/formatters.dart';
 
+// Displays account name and balances in a list tile.
 class AccountTile extends StatelessWidget {
   const AccountTile({super.key, required this.account, this.onTap});
 
@@ -11,6 +13,7 @@ class AccountTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Present account details with a leading icon.
     return ListTile(
       onTap: onTap,
       leading: const CircleAvatar(

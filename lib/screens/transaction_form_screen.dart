@@ -1,3 +1,4 @@
+// Transaction create/edit form with optional photo.
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import '../stores/finance_store.dart';
 import '../utils/category_meta.dart';
 import '../utils/formatters.dart';
 
+// Form screen to add or edit a transaction.
 class TransactionFormScreen extends StatefulWidget {
   const TransactionFormScreen({super.key, this.transaction});
 
@@ -21,22 +23,26 @@ class TransactionFormScreen extends StatefulWidget {
 }
 
 class _TransactionFormScreenState extends State<TransactionFormScreen> {
+  // Form state and field controllers.
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _picker = ImagePicker();
 
+  // Selected values for the transaction.
   TransactionType _type = TransactionType.expense;
   CategoryType _category = CategoryType.food;
   DateTime _date = DateTime.now();
   String? _accountId;
   String? _photoPath;
 
+  // Convenience flag for edit vs create.
   bool get _isEditing => widget.transaction != null;
 
   @override
   void initState() {
     super.initState();
+    // Seed form values when editing.
     final transaction = widget.transaction;
     if (transaction != null) {
       _titleController.text = transaction.title;
@@ -51,6 +57,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
   @override
   void dispose() {
+    // Dispose controllers to avoid leaks.
     _titleController.dispose();
     _amountController.dispose();
     super.dispose();
@@ -64,6 +71,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       ),
       body: Consumer<FinanceStore>(
         builder: (context, store, _) {
+          // Validate saved account selection against current accounts.
           final validAccountId =
               _accountId != null && store.accountById(_accountId) != null
                   ? _accountId
@@ -191,6 +199,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     );
   }
 
+  // Photo picker section with preview and actions.
   Widget _buildPhotoPicker() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,6 +248,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     );
   }
 
+  // Date picker for the transaction date.
   Future<void> _pickDate(BuildContext context) async {
     final selected = await showDatePicker(
       context: context,
@@ -252,6 +262,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     }
   }
 
+  // Image picker for an optional receipt/photo.
   Future<void> _pickPhoto() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null && mounted) {
@@ -259,6 +270,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     }
   }
 
+  // Validates and persists the transaction.
   Future<void> _save(BuildContext context, FinanceStore store) async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -271,6 +283,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
             ? _accountId
             : null;
 
+    // Update the record or create one.
     if (_isEditing) {
       final original = widget.transaction!;
       final updated = original.copyWith(
@@ -300,11 +313,13 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       await store.addTransaction(transaction);
     }
 
+    // Exit once saved.
     if (context.mounted) {
       Navigator.of(context).pop();
     }
   }
 
+  // Parses amount input using comma or dot decimal separators.
   double? _parseAmount(String? value) {
     if (value == null) {
       return null;

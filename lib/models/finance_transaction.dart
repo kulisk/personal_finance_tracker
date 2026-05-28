@@ -1,7 +1,9 @@
+// Transaction model and Hive adapter.
 import 'package:hive/hive.dart';
 
 import 'enums.dart';
 
+// Represents a single income or expense entry.
 class FinanceTransaction {
   FinanceTransaction({
     required this.id,
@@ -25,6 +27,7 @@ class FinanceTransaction {
   final String? accountId;
   final String? photoPath;
 
+  // Creates a modified copy, with optional clears for nullable fields.
   FinanceTransaction copyWith({
     String? id,
     String? title,
@@ -52,12 +55,14 @@ class FinanceTransaction {
   }
 }
 
+// Hive adapter for transactions.
 class FinanceTransactionAdapter extends TypeAdapter<FinanceTransaction> {
   @override
   final int typeId = 1;
 
   @override
   FinanceTransaction read(BinaryReader reader) {
+    // Deserialize fields in the same order as written.
     final id = reader.readString();
     final title = reader.readString();
     final amount = reader.readDouble();
@@ -85,6 +90,7 @@ class FinanceTransactionAdapter extends TypeAdapter<FinanceTransaction> {
 
   @override
   void write(BinaryWriter writer, FinanceTransaction obj) {
+    // Serialize fields in a stable order.
     writer
       ..writeString(obj.id)
       ..writeString(obj.title)

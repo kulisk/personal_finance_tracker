@@ -1,3 +1,4 @@
+// Transaction list with filters and totals.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,8 +10,10 @@ import '../widgets/empty_state.dart';
 import '../widgets/transaction_tile.dart';
 import 'transaction_detail_screen.dart';
 
+// Sorting options for transaction lists.
 enum DateSortOrder { newestFirst, oldestFirst }
 
+// Displays transactions with filters and summary totals.
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
 
@@ -19,13 +22,16 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
+  // Active filter and sort state.
   TransactionType? _filterType;
   DateSortOrder _sortOrder = DateSortOrder.newestFirst;
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild when the store changes.
     return Consumer<FinanceStore>(
       builder: (context, store, _) {
+        // Apply filters and compute totals.
         final filtered = _applyFilters(store.transactions);
         final totals = _buildTotals(store);
 
@@ -40,7 +46,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         return ListView(
           padding: const EdgeInsets.only(bottom: 24),
           children: [
+            // Summary totals row.
             totals,
+            // Filter controls.
             _buildFilters(context),
             const SizedBox(height: 8),
             if (filtered.isEmpty)
@@ -65,6 +73,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
+  // Filters and sorts transactions by the current UI state.
   List<FinanceTransaction> _applyFilters(
     List<FinanceTransaction> transactions,
   ) {
@@ -85,6 +94,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return filtered;
   }
 
+  // Builds filter dropdowns for type and sort order.
   Widget _buildFilters(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -138,6 +148,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
+  // Summary cards for total income and expense.
   Widget _buildTotals(FinanceStore store) {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -163,6 +174,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
+  // Opens the transaction detail view.
   void _openDetails(BuildContext context, FinanceTransaction transaction) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -172,6 +184,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 }
 
+// Card used in the totals row.
 class _TotalCard extends StatelessWidget {
   const _TotalCard({
     required this.label,

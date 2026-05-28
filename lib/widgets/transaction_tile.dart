@@ -1,3 +1,4 @@
+// Reusable list tile for transactions.
 import 'package:flutter/material.dart';
 
 import '../models/account.dart';
@@ -6,6 +7,7 @@ import '../models/finance_transaction.dart';
 import '../utils/category_meta.dart';
 import '../utils/formatters.dart';
 
+// Displays a transaction with category, date, and amount.
 class TransactionTile extends StatelessWidget {
   const TransactionTile({
     super.key,
@@ -20,6 +22,7 @@ class TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Derive label and color from category and type.
     final meta = metaFor(transaction.category);
     final isIncome = transaction.type == TransactionType.income;
     final amountColor =

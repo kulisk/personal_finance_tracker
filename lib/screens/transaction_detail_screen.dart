@@ -1,3 +1,4 @@
+// Detailed view for a single transaction.
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import '../utils/category_meta.dart';
 import '../utils/formatters.dart';
 import 'transaction_form_screen.dart';
 
+// Shows all details for a single transaction.
 class TransactionDetailScreen extends StatelessWidget {
   const TransactionDetailScreen({super.key, required this.transactionId});
 
@@ -17,6 +19,7 @@ class TransactionDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to transaction updates.
     return Consumer<FinanceStore>(
       builder: (context, store, _) {
         final transaction = store.transactionById(transactionId);
@@ -54,6 +57,7 @@ class TransactionDetailScreen extends StatelessWidget {
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              // Photo header or placeholder.
               _buildPhoto(transaction, meta),
               const SizedBox(height: 16),
               Card(
@@ -92,6 +96,7 @@ class TransactionDetailScreen extends StatelessWidget {
     );
   }
 
+  // Renders the attached photo if present.
   Widget _buildPhoto(FinanceTransaction transaction, CategoryMeta meta) {
     if (transaction.photoPath != null) {
       return ClipRRect(
@@ -109,6 +114,7 @@ class TransactionDetailScreen extends StatelessWidget {
     return _fallbackImage(meta);
   }
 
+  // Placeholder image using category styling.
   Widget _fallbackImage(CategoryMeta meta) {
     return Container(
       height: 180,
@@ -120,6 +126,7 @@ class TransactionDetailScreen extends StatelessWidget {
     );
   }
 
+  // Confirms and deletes the transaction.
   Future<void> _confirmDelete(
     BuildContext context,
     FinanceStore store,

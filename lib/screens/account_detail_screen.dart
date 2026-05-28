@@ -1,3 +1,4 @@
+// Account details view with recent activity and balance chart.
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import '../stores/finance_store.dart';
 import '../utils/formatters.dart';
 import 'accounts_screen.dart';
 
+// Displays balances, chart, and recent transactions for one account.
 class AccountDetailScreen extends StatelessWidget {
   const AccountDetailScreen({super.key, required this.accountId});
 
@@ -16,6 +18,7 @@ class AccountDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild when account data changes.
     return Consumer<FinanceStore>(
       builder: (context, store, _) {
         final account = store.accountById(accountId);
@@ -25,6 +28,7 @@ class AccountDetailScreen extends StatelessWidget {
           );
         }
 
+        // Pull transactions tied to this account.
         final accountTransactions =
             store.transactions
                 .where((transaction) => transaction.accountId == accountId)
@@ -48,8 +52,10 @@ class AccountDetailScreen extends StatelessWidget {
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              // Balance summary card.
               _buildSummary(account),
               const SizedBox(height: 16),
+              // Trend chart for recent balance history.
               _buildChart(account, accountTransactions),
               const SizedBox(height: 16),
               Text(
@@ -57,6 +63,7 @@ class AccountDetailScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
+              // List of latest transactions.
               ..._buildRecent(accountTransactions),
             ],
           ),
@@ -65,6 +72,7 @@ class AccountDetailScreen extends StatelessWidget {
     );
   }
 
+  // Summary card showing current and initial balance.
   Widget _buildSummary(Account account) {
     return Card(
       child: Padding(
@@ -86,6 +94,7 @@ class AccountDetailScreen extends StatelessWidget {
     );
   }
 
+  // Line chart showing daily balance over a 60-day window.
   Widget _buildChart(Account account, List<FinanceTransaction> transactions) {
     final series = _buildBalanceSeries(account, transactions);
 
@@ -156,6 +165,7 @@ class AccountDetailScreen extends StatelessWidget {
     );
   }
 
+  // Builds a compact list of transactions.
   List<Widget> _buildRecent(List<FinanceTransaction> transactions) {
     if (transactions.isEmpty) {
       return [
@@ -183,6 +193,7 @@ class AccountDetailScreen extends StatelessWidget {
     }).toList();
   }
 
+  // Converts transactions to daily balance points.
   List<FlSpot> _buildBalanceSeries(
     Account account,
     List<FinanceTransaction> transactions,
@@ -198,14 +209,17 @@ class AccountDetailScreen extends StatelessWidget {
     final Map<int, double> dailyDelta = {};
 
     for (final transaction in transactions) {
+      // Normalize to date-only for grouping.
       final date = DateTime(
         transaction.date.year,
         transaction.date.month,
         transaction.date.day,
       );
       if (date.isBefore(startDate)) {
+        // Apply transactions outside the window to the starting balance.
         balanceAtStart += _signedAmount(transaction);
       } else {
+        // Aggregate day deltas for the chart window.
         final dayIndex = date.difference(startDate).inDays;
         dailyDelta[dayIndex] =
             (dailyDelta[dayIndex] ?? 0) + _signedAmount(transaction);
@@ -222,12 +236,14 @@ class AccountDetailScreen extends StatelessWidget {
     return series;
   }
 
+  // Returns signed amount based on transaction type.
   double _signedAmount(FinanceTransaction transaction) {
     return transaction.type == TransactionType.income
         ? transaction.amount
         : -transaction.amount;
   }
 
+  // Confirms and deletes the account, unlinking its transactions.
   Future<void> _confirmDelete(
     BuildContext context,
     FinanceStore store,

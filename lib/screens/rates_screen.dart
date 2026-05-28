@@ -1,3 +1,4 @@
+// Exchange rates screen with summary and chart.
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +7,7 @@ import '../services/exchange_rate_service.dart';
 import '../utils/formatters.dart';
 import '../widgets/empty_state.dart';
 
+// Shows EUR exchange rates against USD and GBP.
 class RatesScreen extends StatefulWidget {
   const RatesScreen({super.key});
 
@@ -14,15 +16,19 @@ class RatesScreen extends StatefulWidget {
 }
 
 class _RatesScreenState extends State<RatesScreen> {
+  // Service used to fetch exchange rates.
   final ExchangeRateService _service = ExchangeRateService();
+  // Pending request for rate points.
   late Future<List<ExchangeRatePoint>> _futureRates;
 
   @override
   void initState() {
     super.initState();
+    // Initial load.
     _futureRates = _service.fetchRates();
   }
 
+  // Refreshes the data by reloading the future.
   void _reload() {
     setState(() {
       _futureRates = _service.fetchRates();
@@ -31,6 +37,7 @@ class _RatesScreenState extends State<RatesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Build based on future state.
     return FutureBuilder<List<ExchangeRatePoint>>(
       future: _futureRates,
       builder: (context, snapshot) {
@@ -38,6 +45,7 @@ class _RatesScreenState extends State<RatesScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // Show generic error UI.
         if (snapshot.hasError) {
           return _buildErrorState();
         }
@@ -54,12 +62,16 @@ class _RatesScreenState extends State<RatesScreen> {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // Title and refresh control.
             _buildHeader(context),
             const SizedBox(height: 12),
+            // Latest rate snapshot.
             _buildSummary(points),
             const SizedBox(height: 16),
+            // Rate history chart.
             _buildChart(points),
             const SizedBox(height: 12),
+            // Line legend.
             _buildLegend(),
           ],
         );
@@ -67,6 +79,7 @@ class _RatesScreenState extends State<RatesScreen> {
     );
   }
 
+  // Section header with refresh action.
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,6 +97,7 @@ class _RatesScreenState extends State<RatesScreen> {
     );
   }
 
+  // Summary card showing the rate snapshot.
   Widget _buildSummary(List<ExchangeRatePoint> points) {
     final latest = points.last;
 
@@ -123,6 +137,7 @@ class _RatesScreenState extends State<RatesScreen> {
     );
   }
 
+  // Line chart for USD and GBP series.
   Widget _buildChart(List<ExchangeRatePoint> points) {
     final usdSpots = <FlSpot>[];
     final gbpSpots = <FlSpot>[];
@@ -139,13 +154,15 @@ class _RatesScreenState extends State<RatesScreen> {
     }
 
     final padding = (maxY - minY).abs() * 0.2 + 0.01;
-    final labelStep = points.length <= 8
-      ? 1
-      : points.length <= 14
-        ? 2
-        : points.length <= 24
-          ? 3
-          : 5;
+    // Adjust label density based on dataset size.
+    final labelStep =
+        points.length <= 8
+            ? 1
+            : points.length <= 14
+            ? 2
+            : points.length <= 24
+            ? 3
+            : 5;
 
     return Card(
       child: Padding(
@@ -206,14 +223,15 @@ class _RatesScreenState extends State<RatesScreen> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 44,
-                    getTitlesWidget: (value, meta) => SideTitleWidget(
-                      axisSide: meta.axisSide,
-                      space: 8,
-                      child: Text(
-                        formatRate(value),
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    ),
+                    getTitlesWidget:
+                        (value, meta) => SideTitleWidget(
+                          axisSide: meta.axisSide,
+                          space: 8,
+                          child: Text(
+                            formatRate(value),
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ),
                   ),
                 ),
               ),
@@ -240,6 +258,7 @@ class _RatesScreenState extends State<RatesScreen> {
     );
   }
 
+  // Legend describing line colors.
   Widget _buildLegend() {
     return Wrap(
       spacing: 16,
@@ -251,6 +270,7 @@ class _RatesScreenState extends State<RatesScreen> {
     );
   }
 
+  // Error view shown when the API call fails.
   Widget _buildErrorState() {
     return Center(
       child: Padding(
@@ -284,6 +304,7 @@ class _RatesScreenState extends State<RatesScreen> {
   }
 }
 
+// Small tile used in the summary card.
 class _RateTile extends StatelessWidget {
   const _RateTile({
     required this.label,
@@ -320,6 +341,7 @@ class _RateTile extends StatelessWidget {
   }
 }
 
+// Legend dot with label.
 class _LegendItem extends StatelessWidget {
   const _LegendItem({required this.color, required this.label});
 

@@ -1,5 +1,7 @@
+// Account model and Hive adapter.
 import 'package:hive/hive.dart';
 
+// Represents a user account with balance tracking.
 class Account {
   Account({
     required this.id,
@@ -15,6 +17,7 @@ class Account {
   final double balance;
   final DateTime createdAt;
 
+  // Creates a modified copy of the account.
   Account copyWith({
     String? id,
     String? name,
@@ -32,12 +35,14 @@ class Account {
   }
 }
 
+// Hive adapter for persisting accounts.
 class AccountAdapter extends TypeAdapter<Account> {
   @override
   final int typeId = 0;
 
   @override
   Account read(BinaryReader reader) {
+    // Deserialize fields in the same order as written.
     final id = reader.readString();
     final name = reader.readString();
     final initialBalance = reader.readDouble();
@@ -54,6 +59,7 @@ class AccountAdapter extends TypeAdapter<Account> {
 
   @override
   void write(BinaryWriter writer, Account obj) {
+    // Serialize fields in a stable order.
     writer
       ..writeString(obj.id)
       ..writeString(obj.name)

@@ -1,3 +1,4 @@
+// Exchange rate API client and parsing helpers.
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -5,9 +6,12 @@ import 'package:intl/intl.dart';
 
 import '../models/exchange_rate_point.dart';
 
+// Fetches EUR exchange rates from the Frankfurter API.
 class ExchangeRateService {
+  // API date formatting for range endpoints.
   static final DateFormat _apiDateFormat = DateFormat('yyyy-MM-dd');
 
+  // Returns time-series rates, falling back to latest on failure.
   Future<List<ExchangeRatePoint>> fetchRates({int days = 30}) async {
     final normalizedDays = days < 1 ? 1 : days;
 
@@ -21,6 +25,7 @@ class ExchangeRateService {
     return _fetchLatest();
   }
 
+  // Requests a time series for the specified number of days.
   Future<List<ExchangeRatePoint>> _fetchTimeSeries(int days) async {
     final endDate = _dateOnly(DateTime.now());
     final startDate = endDate.subtract(Duration(days: days));
@@ -47,6 +52,7 @@ class ExchangeRateService {
       return [];
     }
 
+    // Parse rate entries into points.
     final points = <ExchangeRatePoint>[];
     for (final entry in rates.entries) {
       final date = DateTime.tryParse(entry.key);
@@ -74,6 +80,7 @@ class ExchangeRateService {
     return points;
   }
 
+  // Requests the latest available rates when the series fails.
   Future<List<ExchangeRatePoint>> _fetchLatest() async {
     final uri = Uri.https('api.frankfurter.app', '/latest', {
       'from': 'EUR',
@@ -111,6 +118,7 @@ class ExchangeRateService {
     ];
   }
 
+  // Normalizes a DateTime to date-only for display and grouping.
   DateTime _dateOnly(DateTime value) {
     return DateTime(value.year, value.month, value.day);
   }

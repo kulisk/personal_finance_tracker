@@ -1,3 +1,4 @@
+// Home screen with bottom navigation and theme picker.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +9,7 @@ import 'transaction_form_screen.dart';
 import 'transactions_screen.dart';
 import '../stores/theme_store.dart';
 
+// Main navigation shell for the app.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -16,8 +18,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Selected tab index.
   int _index = 0;
 
+  // Preset palette for theme selection.
   static const List<Color> _themeColors = [
     Color(0xFF1B7F7A),
     Color(0xFF1565C0),
@@ -29,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Color(0xFF455A64),
   ];
 
+  // Tabs shown in the bottom navigation.
   final List<Widget> _pages = const [
     TransactionsScreen(),
     AccountsScreen(),
@@ -38,12 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Use theme colors from the theme scheme.
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_titleForIndex(_index)),
         actions: [
+          // Shortcut to pick a theme color.
           IconButton(
             tooltip: 'Theme color',
             icon: const Icon(Icons.palette_outlined),
@@ -53,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
+        // Long press to open the theme picker quickly.
         onLongPress: () => _showThemeColorPicker(context),
         child: IndexedStack(index: _index, children: _pages),
       ),
@@ -83,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Title shown in the app bar for each tab.
   String _titleForIndex(int index) {
     switch (index) {
       case 0:
@@ -98,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Floating action button varies by active tab.
   Widget? _buildFab(BuildContext context) {
     if (_index == 0) {
       return FloatingActionButton(
@@ -120,11 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return null;
   }
 
+  // Shows the bottom sheet for selecting theme colors.
   void _showThemeColorPicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
       builder: (sheetContext) {
+        // Watch the current seed color to reflect selection.
         final selectedColor = sheetContext.watch<ThemeStore>().seedColor;
 
         return SafeArea(
@@ -142,15 +154,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 Wrap(
                   spacing: 12,
                   runSpacing: 12,
-                  children: _themeColors
-                      .map(
-                        (color) => _buildColorSwatch(
-                          sheetContext,
-                          color,
-                          selectedColor,
-                        ),
-                      )
-                      .toList(),
+                  children:
+                      _themeColors
+                          .map(
+                            (color) => _buildColorSwatch(
+                              sheetContext,
+                              color,
+                              selectedColor,
+                            ),
+                          )
+                          .toList(),
                 ),
               ],
             ),
@@ -165,12 +178,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Color color,
     Color selectedColor,
   ) {
+    // Mark the selected color.
     final isSelected = color.value == selectedColor.value;
     final iconColor = _iconColorForSwatch(color);
 
     return InkWell(
       borderRadius: BorderRadius.circular(24),
       onTap: () {
+        // Save the theme color and dismiss the sheet.
         context.read<ThemeStore>().setSeedColor(color);
         Navigator.of(context).pop();
       },
@@ -181,9 +196,10 @@ class _HomeScreenState extends State<HomeScreen> {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected
-                ? Theme.of(context).colorScheme.onSurface
-                : Colors.transparent,
+            color:
+                isSelected
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Colors.transparent,
             width: 2,
           ),
         ),
@@ -193,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Computes icon color for sufficient contrast.
   Color _iconColorForSwatch(Color color) {
     final brightness = ThemeData.estimateBrightnessForColor(color);
     return brightness == Brightness.dark ? Colors.white : Colors.black;

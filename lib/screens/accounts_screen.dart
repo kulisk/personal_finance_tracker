@@ -1,3 +1,4 @@
+// Account list screen and account form dialog.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -9,11 +10,13 @@ import '../widgets/account_tile.dart';
 import '../widgets/empty_state.dart';
 import 'account_detail_screen.dart';
 
+// Shows all accounts and navigates to detail screens.
 class AccountsScreen extends StatelessWidget {
   const AccountsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild when account list changes.
     return Consumer<FinanceStore>(
       builder: (context, store, _) {
         if (store.accounts.isEmpty) {
@@ -27,6 +30,7 @@ class AccountsScreen extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.only(bottom: 24),
           children: [
+            // Account cards.
             ...store.accounts.map(
               (account) => Card(
                 child: AccountTile(
@@ -41,6 +45,7 @@ class AccountsScreen extends StatelessWidget {
     );
   }
 
+  // Opens the account detail page.
   void _openDetails(BuildContext context, Account account) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -50,16 +55,19 @@ class AccountsScreen extends StatelessWidget {
   }
 }
 
+// Shows a dialog for creating or editing an account.
 Future<void> showAccountFormDialog(
   BuildContext context, {
   Account? account,
 }) async {
+  // Controllers seeded with saved data when editing.
   final nameController = TextEditingController(text: account?.name ?? '');
   final balanceController = TextEditingController(
     text: account == null ? '' : account.initialBalance.toStringAsFixed(2),
   );
   final formKey = GlobalKey<FormState>();
 
+  // Access the store for persistence.
   final store = context.read<FinanceStore>();
 
   final saved = await showDialog<bool>(
@@ -129,10 +137,12 @@ Future<void> showAccountFormDialog(
         ),
   );
 
+  // Exit early if the user canceled.
   if (saved != true) {
     return;
   }
 
+  // Create or update the account based on the dialog mode.
   if (account == null) {
     final initialBalance = _parseAmount(balanceController.text) ?? 0;
     final newAccount = Account(
@@ -148,6 +158,7 @@ Future<void> showAccountFormDialog(
     await store.updateAccount(updated);
   }
 
+  // Notify the user of the change.
   if (context.mounted) {
     final info =
         account == null
@@ -157,6 +168,7 @@ Future<void> showAccountFormDialog(
   }
 }
 
+// Parses a currency input using either comma or dot decimal separators.
 double? _parseAmount(String? value) {
   if (value == null) {
     return null;

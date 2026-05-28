@@ -1,7 +1,9 @@
+// Category label, icon, and color metadata.
 import 'package:flutter/material.dart';
 
 import '../models/enums.dart';
 
+// Metadata for a transaction category.
 class CategoryMeta {
   const CategoryMeta({
     required this.label,
@@ -14,6 +16,7 @@ class CategoryMeta {
   final Color color;
 }
 
+// Lookup table for all supported categories.
 const Map<CategoryType, CategoryMeta> categoryMeta = {
   CategoryType.food: CategoryMeta(
     label: 'Food',
@@ -57,6 +60,7 @@ const Map<CategoryType, CategoryMeta> categoryMeta = {
   ),
 };
 
+// Returns metadata for a given category, defaulting to "Other".
 CategoryMeta metaFor(CategoryType type) {
   return categoryMeta[type] ?? categoryMeta[CategoryType.other]!;
 }

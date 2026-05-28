@@ -1,5 +1,7 @@
+// Generic empty state widget for lists and screens.
 import 'package:flutter/material.dart';
 
+// Shows an icon, title, and message centered on the screen.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -14,6 +16,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Pull typography and colors from the theme.
     final theme = Theme.of(context);
 
     return Center(
@@ -22,6 +25,7 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Icon and text stack.
             Icon(icon, size: 48, color: theme.colorScheme.primary),
             const SizedBox(height: 12),
             Text(
